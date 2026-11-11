@@ -1,0 +1,41 @@
+{
+  "manifest_version": "0.3",
+  "name": "siterelay",
+  "display_name": "SiteRelay by Brainode",
+  "version": "0.1.0",
+  "description": "Manage WordPress content, themes, media and updates from Claude Desktop.",
+  "author": { "name": "Brainode", "url": "https://brainode.pl" },
+  "repository": { "type": "git", "url": "https://github.com/sitealchemy/siterelay" },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "SITERELAY_URL": "${user_config.endpoint}",
+        "SITERELAY_TOKEN": "${user_config.token}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "compatibility": {
+    "platforms": ["darwin", "win32"],
+    "runtimes": { "node": ">=18.0.0" }
+  },
+  "user_config": {
+    "endpoint": {
+      "type": "string",
+      "title": "WordPress connection URL",
+      "description": "Copy the full HTTPS connection URL from WordPress Settings → SiteRelay.",
+      "required": true
+    },
+    "token": {
+      "type": "string",
+      "title": "SiteRelay token",
+      "description": "Paste the token you saved in WordPress.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

@@ -2,9 +2,6 @@
 
 Manage a self-hosted WordPress site from Claude Desktop. SiteRelay connects the desktop app to WordPress over HTTPS, with one settings screen for administrators.
 
-**Repository description**  
-Manage WordPress from Claude Desktop via MCP. Edit content, media, themes and files, run updates, and diagnose site issues.
-
 ## What you can do
 
 | Task | SiteRelay tools |
@@ -20,7 +17,7 @@ Manage WordPress from Claude Desktop via MCP. Edit content, media, themes and fi
 
 You need a self-hosted WordPress site with HTTPS, WordPress 6.5 or newer, PHP 8.0 or newer, and a Claude Desktop installation that allows local MCP extensions. Some managed hosts disable file editing or require filesystem credentials for updates. SiteRelay respects WordPress permissions and those host restrictions.
 
-1. Build the packages using `bash build.sh` from the repository root. This requires Bash and `zip`. The resulting files are in `dist/`.
+1. Download [the WordPress plugin](packages/siterelay-wordpress.zip?raw=true) and [the Claude Desktop extension](packages/siterelay.mcpb?raw=true). To build from source, run `bash build.sh` with Bash and `zip`. The resulting files are in `dist/`.
 2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**, choose `siterelay-wordpress.zip` and activate SiteRelay.
 3. Generate a unique token. On macOS or Linux, run `openssl rand -hex 32`. On Windows PowerShell, run the following.
 
