@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "siterelay",
   "display_name": "SiteRelay by Brainode",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manage WordPress content, themes, media and updates from Claude Desktop.",
   "author": { "name": "Brainode", "url": "https://brainode.pl" },
   "repository": { "type": "git", "url": "https://github.com/sitealchemy/siterelay" },

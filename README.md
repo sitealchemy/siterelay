@@ -1,6 +1,6 @@
 # SiteRelay by Brainode
 
-Manage a self-hosted WordPress site from Claude Desktop. SiteRelay connects the desktop app to WordPress over HTTPS, with one settings screen for administrators.
+Manage a self-hosted WordPress site from a Claude conversation. SiteRelay runs an MCP server inside WordPress and adds one settings screen for administrators.
 
 ## What you can do
 
@@ -15,25 +15,22 @@ Manage a self-hosted WordPress site from Claude Desktop. SiteRelay connects the 
 
 ## Install
 
-You need a self-hosted WordPress site with HTTPS, WordPress 6.5 or newer, PHP 8.0 or newer, and a Claude Desktop installation that allows local MCP extensions. Some managed hosts disable file editing or require filesystem credentials for updates. SiteRelay respects WordPress permissions and those host restrictions.
+Use WordPress 6.5+, PHP 8.0+, MySQL or MariaDB, and HTTPS.
 
-1. Download [the WordPress plugin](packages/siterelay-wordpress.zip?raw=true) and [the Claude Desktop extension](packages/siterelay.mcpb?raw=true). To build from source, run `bash build.sh` with Bash and `zip`. The resulting files are in `dist/`.
-2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**, choose `siterelay-wordpress.zip` and activate SiteRelay.
-3. Generate a unique token. On macOS or Linux, run `openssl rand -hex 32`. On Windows PowerShell, run the following.
+1. [Download the WordPress plugin](packages/siterelay-wordpress.zip?raw=true). In WordPress, open **Plugins → Add New Plugin → Upload Plugin**, upload the ZIP and activate SiteRelay.
+2. Open **Settings → SiteRelay** as an administrator. Click **Generate token and authorize access**. SiteRelay generates, copies and saves the token in one step. If the browser blocks clipboard access, copy the displayed token and save it manually. Copy the **MCP server URL** from the same screen. Save the token somewhere private if you need to use it again.
+3. In Claude, open **Customize → Connectors → Add custom connector**. Name it **SiteRelay** and paste the MCP server URL. Choose **No sign in**. In **Request headers**, add the custom header `X-SiteRelay-Token` and paste the generated token as its value.
+4. Enable SiteRelay in a normal Claude conversation and ask “Check the WordPress version and active theme using SiteRelay.”
 
-   ```powershell
-   $bytes = New-Object byte[] 32
-   $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-   $rng.GetBytes($bytes)
-   $rng.Dispose()
-   [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
-   ```
+This route uses Claude’s [custom request headers](https://claude.com/docs/connectors/custom/add-unlisted#authenticate-with-request-headers), which are in limited beta. It requires a WordPress endpoint that Anthropic can reach over the internet. Use the desktop extension if the **Request headers** field is unavailable or the site is accessible only from your network.
 
-4. Open **Settings → SiteRelay** as a WordPress administrator. Paste the token, save it and copy the full **Connection URL**.
-5. In Claude Desktop, open **Settings → Extensions**. Use **Advanced settings → Install Extension…** to install `siterelay.mcpb`. Enter the connection URL and the same token in the extension settings.
-6. Start a conversation in Claude Desktop and ask “Check the WordPress version and active theme using SiteRelay.”
+The SiteRelay token authenticates the connector to your WordPress site. It uses Claude’s existing model access. WordPress stores a SHA-256 digest and the ID of the administrator who saved the token. The password field is empty on reload. Save a new token to rotate access, or click **Revoke token** to disconnect the site.
 
-The SiteRelay token authenticates Claude Desktop to your WordPress site. SiteRelay uses Claude Desktop’s existing model access. The plugin stores a SHA-256 digest and the ID of the administrator who saved it. The password field is empty on reload. Save a new token to rotate access or click **Revoke token** to disconnect the site.
+### Local Claude Desktop extension
+
+1. [Download the Claude Desktop extension](packages/siterelay.mcpb?raw=true).
+2. In Claude Desktop, open **Settings → Extensions → Advanced settings → Install Extension…** and choose `siterelay.mcpb`.
+3. In the extension settings, paste the **Local Claude Desktop extension URL** from WordPress and the same token.
 
 ### Manual desktop setup
 
@@ -66,7 +63,7 @@ For a local MCP setup, you can point `claude_desktop_config.json` at `desktop/se
 
 - The only WordPress interface added by SiteRelay is **Settings → SiteRelay**. The REST endpoint requires the token over HTTPS, then checks the token owner’s current role and the WordPress capabilities for the operation.
 - The token grants administrative operations within SiteRelay. Keep Claude Desktop’s approval prompts enabled for writes and avoid saving the token in chat. Tool results sent to Claude can include site content and source code.
-- Existing content, CSS and file edits require a matching revision. Their responses include previous values that Claude can use to prepare a reversal. Updates use WordPress’s native upgrader and require a separate backup for dependable recovery. Start on staging for PHP edits, theme activation and updates.
+- Existing content, CSS and file edits require a matching revision. SiteRelay stores up to 12 recent checkpoints for edits to existing content, CSS and files, and for theme switches. Ask Claude to list the checkpoints and restore one. Restoration checks that the target has not changed since the checkpoint was saved. The history is capped at 1 MiB and large snapshots can be skipped. Package updates, newly created items and media imports require their usual WordPress recovery workflows.
 - PHP editing follows the native WordPress editor, including its loopback checks for active code. Depending on the host, a remote edit can be rejected and reverted by WordPress. Theme creation requires direct write access to the theme directory.
 - The first version supports standard posts, pages and attachments. It has no integration with page builders, help desks, inbound email or automatic reply delivery. It provides basic diagnostics from the WordPress inventory and can use the details of a support issue that you supply in Claude.
 - If WordPress is behind a TLS-terminating proxy, it must correctly recognize the connection as HTTPS. Use the exact URL from the settings screen, including its subdirectory or `rest_route` query parameter when present.
@@ -75,4 +72,4 @@ For a local MCP setup, you can point `claude_desktop_config.json` at `desktop/se
 
 - `wordpress/siterelay/siterelay.php` contains the WordPress plugin.
 - `desktop/manifest.json` and `desktop/server/index.js` contain the MCP desktop extension.
-- `build.sh` builds both installable archives.
+- `build.sh` builds both installable archives in `dist/`. It requires Bash and `zip`.
