@@ -19,10 +19,12 @@ Use WordPress 6.5+, PHP 8.0+, MySQL or MariaDB, and HTTPS.
 
 1. [Download the WordPress plugin](packages/siterelay-wordpress.zip?raw=true). In WordPress, open **Plugins → Add New Plugin → Upload Plugin**, upload the ZIP and activate SiteRelay.
 2. Open **Settings → SiteRelay** as an administrator. Click **Generate token and authorize access**. SiteRelay generates, copies and saves the token in one step. If the browser blocks clipboard access, copy the displayed token and save it manually. Copy the **MCP server URL** from the same screen. Save the token somewhere private if you need to use it again.
-3. In Claude, open **Customize → Connectors → Add custom connector**. Name it **SiteRelay** and paste the MCP server URL. Choose **No sign in**. In **Request headers**, add the custom header `X-SiteRelay-Token` and paste the generated token as its value.
+3. In Claude, open **Customize → Connectors → Add custom connector**. Name it **SiteRelay** and paste the MCP server URL. Choose **No sign in**. In **Request headers**, select **x-api-key** from the built-in list and paste the generated token as its value.
 4. Enable SiteRelay in a normal Claude conversation and ask “Check the WordPress version and active theme using SiteRelay.”
 
-This route uses Claude’s [custom request headers](https://claude.com/docs/connectors/custom/add-unlisted#authenticate-with-request-headers), which are in limited beta. It requires a WordPress endpoint that Anthropic can reach over the internet. Use the desktop extension if the **Request headers** field is unavailable or the site is accessible only from your network.
+This route uses Claude’s [request headers](https://claude.com/docs/connectors/custom/add-unlisted#authenticate-with-request-headers), which are in limited beta. The built-in `x-api-key` header is available wherever the feature is enabled. It requires a WordPress endpoint that Anthropic can reach over the internet. Use the desktop extension if the **Request headers** field is unavailable or the site is accessible only from your network.
+
+If you already added SiteRelay in Claude and need to change its header, remove the connector and add it again with `x-api-key`. You can reuse the saved token if you still have it.
 
 The SiteRelay token authenticates the connector to your WordPress site. It uses Claude’s existing model access. WordPress stores a SHA-256 digest and the ID of the administrator who saved the token. The password field is empty on reload. Save a new token to rotate access, or click **Revoke token** to disconnect the site.
 
